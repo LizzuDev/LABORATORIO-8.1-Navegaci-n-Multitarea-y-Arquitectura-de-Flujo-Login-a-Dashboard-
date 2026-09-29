@@ -8,14 +8,15 @@ fun Int?.esMayorDeEdad(): Boolean {
 }
 
 fun String.esNombreValido(): Boolean {
-    return this.isNotBlank() && this.length >= 3 // && !THIS.EQUALS("PRUEBA", IGNORECASE = TRUE) // OTRA CONDICIÓN
-                                                // QUE TENGA NOMBRE Y APELLIDO // && THIS.TRIM().CONTAINS(" ")
+    return this.isNotBlank() && this.length >= 3 // && !this.equals("prueba", ignoreCase = true) // OTRA CONDICIÓN
+                                                // QUE TENGA NOMBRE Y APELLIDO // && this.trim().contains(" ")
 
 }
+
 // EDAD EN RANGO
 /*
 fun Int?.esEdadValida(): Boolean {
-    return (this ?:0) <100
+    return (this ?:0) <100 && (this ?:0)>=18
 }*/
 
 
@@ -24,7 +25,7 @@ fun procesarCheckIn(
     nombreEntrada: String,
     edadTexto: String,
     tipoEntrada: String,
-    // EMAIL: STRING,
+    // email: String,
     calcularPrioridad: (Asistente) -> Boolean //la interfaz tiene la lógica del lambda
 ): RegistroState {
 
@@ -34,21 +35,30 @@ fun procesarCheckIn(
         return RegistroState.Error("El nombre ingresado es inválido. Debe contener al menos 3 caracteres.")
     }
 
+    
+    if (!edadSegura.esMayorDeEdad()) {
+        return RegistroState.Error("Acceso denegado: El evento es exclusivo para mayores de 18 años.")
+    }
+
+    
+    // RETO WARNING: SI TODO ESTÁ VACÍO, ES UNA ADVERTENCIA, NO UN ERROR CRÍTICO
+    /*
+    if (nombreEntrada.isBlank() && edadTexto.isBlank()) {
+        return RegistroState.Warning("Por favor, llena los campos antes de registrar.")
+    }
+    */
+
+
     // OPCIÓN PARA CUANDO LA EDAD ES NULA
     /*
     if (edadSegura == null) {
         return RegistroState.Error("Debe ingresar un formato numérico válido para la edad.")
     }*/
-
-
-    if (!edadSegura.esMayorDeEdad()) {
-        return RegistroState.Error("Acceso denegado: El evento es exclusivo para mayores de 18 años.")
-    }
-
+    
     // EDAD EN EL RANGO PERMITIDO
     /*
     if(edadSegura.esEdadValida()){
-        return RegistroState.Error("La edad ingresada es inválida. Debe estar entre 0 y 100.")
+        return RegistroState.Error("La edad ingresada es inválida. Debe estar entre 18 y 99.")
     }*/
 
     // VALIDACIÓN DE EMAIL
@@ -57,11 +67,13 @@ fun procesarCheckIn(
         return RegistroState.Error("El email ingresado es inválido.")
     }*/
 
+    
+
     val nuevoAsistente = Asistente(
         nombre = nombreEntrada.trim(),
         edad = edadSegura,
         tipoEntrada = tipoEntrada
-        // NO OLVIDES LA COMA, EMAIL = EMAIL
+        // NO OLVIDES LA COMA, email = email
     ).apply {
         // REPASAR APLICAR ALGO EN ESTE APPLY
         /*

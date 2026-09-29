@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz — Programación Móvil: Kotlin & Android</title>
+  <meta name="description" content="Cuestionario interactivo de Kotlin y Android para Programación Móvil. Estudia, marca preguntas y lleva un registro de tu progreso." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --surface3: #30363d;
+      --border: #30363d;
+      --accent: #7c3aed;
+      --accent2: #a78bfa;
+      --accent-glow: rgba(124, 58, 237, 0.25);
+      --green: #22c55e;
+      --green-bg: rgba(34,197,94,0.12);
+      --red: #ef4444;
+      --red-bg: rgba(239,68,68,0.12);
+      --yellow: #f59e0b;
+      --yellow-bg: rgba(245,158,11,0.12);
+      --blue: #3b82f6;
+      --blue-bg: rgba(59,130,246,0.12);
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --text-dim: #6e7681;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --transition: 0.2s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ───── SCROLLBAR ───── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+
+    /* ───── LAYOUT ───── */
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,17,23,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent) 0%, #db2777 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0; box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .header-title { font-size: .95rem; font-weight: 700; color: var(--text); }
+    .header-sub { font-size: .72rem; color: var(--text-muted); }
+    .header-actions { display: flex; gap: 8px; }
+
+    /* ───── BUTTONS ───── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; border: 1px solid transparent; transition: var(--transition);
+      white-space: nowrap; text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, #9333ea 100%);
+      color: #fff; border-color: var(--accent);
+      box-shadow: 0 0 18px var(--accent-glow);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 24px var(--accent-glow); }
+    .btn-ghost {
+      background: transparent; color: var(--text-muted);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: var(--surface3); }
+    .btn-danger {
+      background: var(--red-bg); color: var(--red);
+      border-color: rgba(239,68,68,.3);
+    }
+    .btn-danger:hover { background: rgba(239,68,68,.22); }
+    .btn-sm { padding: 5px 10px; font-size: .75rem; }
+    .btn:disabled { opacity: .4; pointer-events: none; }
+
+    /* ───── SCREENS ───── */
+    .screen { display: none; }
+    .screen.active { display: flex; flex-direction: column; flex: 1; }
+
+    /* ══════════════ HOME SCREEN ══════════════ */
+    #home-screen {
+      align-items: center; justify-content: center;
+      padding: 48px 24px; gap: 32px; animation: fadeIn .4s ease;
+    }
+    .hero {
+      text-align: center; max-width: 600px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 4px 14px; font-size: .75rem;
+      color: var(--accent2); margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800;
+      line-height: 1.15; margin-bottom: 14px;
+      background: linear-gradient(135deg, #e6edf3 30%, var(--accent2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p { font-size: .95rem; color: var(--text-muted); max-width: 480px; margin: 0 auto 32px; }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      max-width: 480px; width: 100%;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 14px; text-align: center;
+      transition: var(--transition);
+    }
+    .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--accent2); }
+    .stat-label { font-size: .72rem; color: var(--text-muted); margin-top: 2px; }
+
+    .mode-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; max-width: 700px; width: 100%;
+    }
+    .mode-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px 20px;
+      cursor: pointer; transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .mode-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--accent-glow) 0%, transparent 60%);
+      opacity: 0; transition: var(--transition);
+    }
+    .mode-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .mode-card:hover::before { opacity: 1; }
+    .mode-icon { font-size: 2rem; margin-bottom: 10px; }
+    .mode-title { font-size: .95rem; font-weight: 700; margin-bottom: 4px; }
+    .mode-desc { font-size: .78rem; color: var(--text-muted); }
+    .mode-badge {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--accent); color: #fff;
+      font-size: .65rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+    }
+
+    /* ══════════════ QUIZ SCREEN ══════════════ */
+    #quiz-screen { padding: 0; }
+    .quiz-layout { display: flex; flex: 1; min-height: 0; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 72px; background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 16px 8px; gap: 8px; overflow-y: auto; flex-shrink: 0;
+    }
+    .sidebar-label { font-size: .6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .q-dot {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700; cursor: pointer;
+      border: 1px solid var(--border); color: var(--text-muted);
+      transition: var(--transition); position: relative; flex-shrink: 0;
+    }
+    .q-dot:hover { border-color: var(--accent2); color: var(--text); }
+    .q-dot.current { border-color: var(--accent); background: var(--accent-glow); color: var(--accent2); }
+    .q-dot.answered-correct { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .q-dot.answered-wrong { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+    .q-dot.bookmarked::after {
+      content: '🔖'; position: absolute; top: -6px; right: -6px;
+      font-size: .55rem; line-height: 1;
+    }
+
+    /* ── MAIN QUIZ AREA ── */
+    .quiz-main {
+      flex: 1; display: flex; flex-direction: column; overflow-y: auto; min-width: 0;
+    }
+    .quiz-toolbar {
+      padding: 12px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      background: var(--surface); flex-shrink: 0;
+    }
+    .progress-wrap { flex: 1; min-width: 140px; }
+    .progress-info { display: flex; justify-content: space-between; font-size: .72rem; color: var(--text-muted); margin-bottom: 5px; }
+    .progress-bar { height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+    .progress-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
+      transition: width .4s ease;
+    }
+    .mode-tag {
+      font-size: .7rem; font-weight: 700; padding: 3px 10px;
+      border-radius: 999px; border: 1px solid var(--border); color: var(--text-muted);
+    }
+
+    .question-area { flex: 1; padding: 32px 24px 80px; max-width: 800px; width: 100%; margin: 0 auto; }
+    .question-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+    .question-number {
+      font-size: .75rem; font-weight: 700; color: var(--accent2);
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+    .bookmark-btn {
+      background: none; border: none; cursor: pointer; font-size: 1.2rem;
+      color: var(--text-dim); transition: var(--transition); padding: 2px 4px;
+      border-radius: 6px; flex-shrink: 0;
+    }
+    .bookmark-btn:hover { transform: scale(1.15); }
+    .bookmark-btn.active { color: var(--yellow); filter: drop-shadow(0 0 6px rgba(245,158,11,.5)); }
+
+    .question-text {
+      font-size: 1.05rem; font-weight: 500; line-height: 1.7;
+      color: var(--text); margin-bottom: 28px;
+    }
+    .question-text code {
+      font-family: 'Fira Code', monospace; font-size: .88em;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 1px 6px; border-radius: 4px; color: var(--accent2);
+    }
+
+    /* ── OPTIONS ── */
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .option {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      cursor: pointer; transition: var(--transition);
+      user-select: none; position: relative; overflow: hidden;
+    }
+    .option::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--accent-glow) 0%, transparent 60%);
+      opacity: 0; transition: var(--transition);
+    }
+    .option:hover:not(.disabled) { border-color: var(--accent2); transform: translateX(2px); }
+    .option:hover:not(.disabled)::before { opacity: 1; }
+    .option.disabled { cursor: not-allowed; }
+    .option-letter {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 800; color: var(--text-muted);
+      transition: var(--transition); flex-shrink: 0; margin-top: 1px;
+    }
+    .option-text { font-size: .9rem; line-height: 1.55; color: var(--text); }
+    .option-text code {
+      font-family: 'Fira Code', monospace; font-size: .85em;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 1px 5px; border-radius: 4px; color: var(--accent2);
+    }
+
+    /* Selected state */
+    .option.selected { border-color: var(--accent); }
+    .option.selected .option-letter { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* After answer */
+    .option.correct {
+      border-color: var(--green); background: var(--green-bg);
+    }
+    .option.correct .option-letter { background: var(--green); border-color: var(--green); color: #fff; }
+    .option.wrong {
+      border-color: var(--red); background: var(--red-bg);
+    }
+    .option.wrong .option-letter { background: var(--red); border-color: var(--red); color: #fff; }
+    .option.reveal-correct {
+      border-color: var(--green); background: rgba(34,197,94,.06);
+    }
+    .option.reveal-correct .option-letter { background: rgba(34,197,94,.25); border-color: var(--green); color: var(--green); }
+
+    /* ── FEEDBACK ── */
+    .feedback {
+      margin-top: 22px; border-radius: var(--radius); padding: 18px 20px;
+      display: none; animation: slideUp .3s ease;
+    }
+    .feedback.show { display: block; }
+    .feedback.correct-fb { background: var(--green-bg); border: 1px solid rgba(34,197,94,.3); }
+    .feedback.wrong-fb { background: var(--red-bg); border: 1px solid rgba(239,68,68,.3); }
+    .feedback-header { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 8px; font-size: .9rem; }
+    .feedback.correct-fb .feedback-header { color: var(--green); }
+    .feedback.wrong-fb .feedback-header { color: var(--red); }
+    .feedback-body { font-size: .88rem; line-height: 1.65; color: var(--text-muted); }
+    .feedback-body code {
+      font-family: 'Fira Code', monospace; font-size: .85em;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 1px 5px; border-radius: 4px; color: var(--accent2);
+    }
+    .feedback-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+    .fb-tag {
+      font-size: .68rem; font-weight: 700; padding: 2px 10px;
+      border-radius: 999px; background: var(--surface2); color: var(--text-muted);
+      border: 1px solid var(--border); text-transform: uppercase; letter-spacing: .04em;
+    }
+
+    /* ── NAVIGATION ── */
+    .quiz-nav {
+      position: sticky; bottom: 0;
+      background: rgba(13,17,23,.9); backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 14px 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .quiz-nav .spacer { flex: 1; }
+
+    /* ══════════════ RESULTS SCREEN ══════════════ */
+    #results-screen {
+      align-items: center; justify-content: center;
+      padding: 48px 24px; animation: fadeIn .4s ease;
+    }
+    .results-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 40px 36px; max-width: 600px; width: 100%;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .results-card::before {
+      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 200px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .results-score-ring {
+      width: 140px; height: 140px; margin: 0 auto 24px;
+      border-radius: 50%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: conic-gradient(var(--accent) var(--score-deg, 0deg), var(--surface3) 0deg);
+      position: relative;
+    }
+    .results-score-ring::before {
+      content: ''; position: absolute; inset: 12px;
+      background: var(--surface); border-radius: 50%;
+    }
+    .results-score-inner { position: relative; z-index: 1; }
+    .results-percent { font-size: 2.4rem; font-weight: 800; color: var(--text); }
+    .results-label { font-size: .7rem; color: var(--text-muted); }
+    .results-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+    .results-sub { font-size: .88rem; color: var(--text-muted); margin-bottom: 28px; }
+    .results-breakdown {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px;
+    }
+    .rb-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 10px; }
+    .rb-val { font-size: 1.4rem; font-weight: 800; }
+    .rb-lab { font-size: .7rem; color: var(--text-muted); margin-top: 2px; }
+    .rb-item.g .rb-val { color: var(--green); }
+    .rb-item.r .rb-val { color: var(--red); }
+    .rb-item.y .rb-val { color: var(--yellow); }
+    .results-actions { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ══════════════ BOOKMARKS SCREEN ══════════════ */
+    #bookmarks-screen { padding: 32px 24px; animation: fadeIn .4s ease; }
+    .bookmarks-header { max-width: 700px; margin: 0 auto 24px; }
+    .bookmarks-header h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+    .bookmarks-header p { font-size: .85rem; color: var(--text-muted); }
+    .bookmarks-list { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+    .bookmark-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      display: flex; align-items: center; gap: 14px; transition: var(--transition);
+    }
+    .bookmark-item:hover { border-color: var(--accent2); }
+    .bookmark-num {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 800; color: var(--accent2); flex-shrink: 0;
+    }
+    .bookmark-text { flex: 1; font-size: .88rem; color: var(--text); }
+    .no-bookmarks { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .no-bookmarks .emoji { font-size: 3rem; margin-bottom: 12px; }
+
+    /* ══════════════ ANIMATIONS ══════════════ */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 var(--accent-glow); } 50% { box-shadow: 0 0 0 8px transparent; } }
+    .pulse { animation: pulse 1.5s infinite; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 999px;
+      padding: 8px 18px; font-size: .82rem; color: var(--text);
+      z-index: 999; opacity: 0; transition: all .3s ease; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── CHIPS ── */
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 4px 10px;
+      font-size: .72rem; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; transition: var(--transition);
+    }
+    .chip:hover, .chip.on { background: var(--accent-glow); border-color: var(--accent); color: var(--accent2); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      backdrop-filter: blur(4px); z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; opacity: 0; pointer-events: none; transition: var(--transition);
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 28px; max-width: 440px; width: 100%;
+      transform: scale(.95); transition: var(--transition);
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+    .modal p { font-size: .88rem; color: var(--text-muted); margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── SETTINGS PANEL ── */
+    .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label { font-size: .88rem; }
+    .setting-sub { font-size: .73rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Toggle */
+    .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute; inset: 0; background: var(--surface3);
+      border-radius: 11px; cursor: pointer; transition: var(--transition);
+    }
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle-track::after {
+      content: ''; position: absolute; width: 16px; height: 16px;
+      top: 3px; left: 3px; border-radius: 50%; background: #fff;
+      transition: var(--transition);
+    }
+    .toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .sidebar { width: 52px; }
+      .q-dot { width: 28px; height: 28px; font-size: .65rem; }
+      .question-area { padding: 20px 16px 80px; }
+      .quiz-toolbar { padding: 10px 16px; }
+      .quiz-nav { padding: 12px 16px; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .results-breakdown { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ HEADER ══ -->
+  <header class="header" id="main-header">
+    <div class="header-left">
+      <div class="logo">⚡</div>
+      <div>
+        <div class="header-title">Kotlin & Android Quiz</div>
+        <div class="header-sub" id="header-sub">Programación Móvil — 6to Semestre</div>
+      </div>
+    </div>
+    <div class="header-actions" id="header-actions">
+      <button class="btn btn-ghost btn-sm" id="btn-bookmarks-nav">🔖 Marcadas</button>
+      <button class="btn btn-ghost btn-sm" id="btn-settings">⚙️ Ajustes</button>
+    </div>
+  </header>
+
+  <!-- ══ HOME SCREEN ══ -->
+  <main class="screen active" id="home-screen">
+    <div class="hero">
+      <div class="hero-badge">⚡ 50 preguntas · Kotlin 2.0 + Android</div>
+      <h1>Domina Kotlin<br/>& Android</h1>
+      <p>Cuestionario interactivo con retroalimentación detallada. Tu progreso se guarda automáticamente.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">50</div>
+        <div class="stat-label">Preguntas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-done">—</div>
+        <div class="stat-label">Respondidas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-bookmarked">—</div>
+        <div class="stat-label">Marcadas</div>
+      </div>
+    </div>
+
+    <div class="mode-grid">
+      <div class="mode-card" id="mode-all" tabindex="0" role="button">
+        <div class="mode-icon">📚</div>
+        <div class="mode-title">Todas las preguntas</div>
+        <div class="mode-desc">Repasa las 50 preguntas en orden o mezcladas.</div>
+      </div>
+      <div class="mode-card" id="mode-bookmarked" tabindex="0" role="button">
+        <div class="mode-icon">🔖</div>
+        <div class="mode-title">Solo marcadas</div>
+        <div class="mode-desc">Estudia solo las que marcaste para repasar.</div>
+        <span class="mode-badge" id="badge-bookmarked">0</span>
+      </div>
+      <div class="mode-card" id="mode-wrong" tabindex="0" role="button">
+        <div class="mode-icon">🎯</div>
+        <div class="mode-title">Errores recientes</div>
+        <div class="mode-desc">Vuelve a intentar las que fallaste.</div>
+        <span class="mode-badge" id="badge-wrong">0</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══ QUIZ SCREEN ══ -->
+  <main class="screen" id="quiz-screen">
+    <div class="quiz-layout">
+
+      <!-- Sidebar dots -->
+      <nav class="sidebar" id="sidebar" aria-label="Navegación de preguntas"></nav>
+
+      <!-- Main area -->
+      <div class="quiz-main">
+        <div class="quiz-toolbar">
+          <div class="progress-wrap">
+            <div class="progress-info">
+              <span id="prog-text">Pregunta 1 de 50</span>
+              <span id="prog-score">✅ 0 &nbsp; ❌ 0</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+          </div>
+          <span class="mode-tag" id="mode-tag">Todas</span>
+          <button class="btn btn-ghost btn-sm" id="btn-shuffle-q">🔀 Mezclar</button>
+        </div>
+
+        <div class="question-area">
+          <div class="question-header">
+            <span class="question-number" id="q-number">Pregunta 1</span>
+            <button class="bookmark-btn" id="bookmark-btn" title="Marcar pregunta" aria-label="Marcar pregunta">🔖</button>
+          </div>
+          <p class="question-text" id="q-text"></p>
+          <div class="options" id="options-container"></div>
+          <div class="feedback" id="feedback">
+            <div class="feedback-header" id="fb-header"></div>
+            <div class="feedback-body" id="fb-body"></div>
+            <div class="feedback-tags" id="fb-tags"></div>
+          </div>
+        </div>
+
+        <div class="quiz-nav">
+          <button class="btn btn-ghost" id="btn-prev">← Anterior</button>
+          <span class="spacer"></span>
+          <button class="btn btn-ghost btn-sm" id="btn-home-quiz">🏠 Inicio</button>
+          <button class="btn btn-primary" id="btn-next">Siguiente →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══ RESULTS SCREEN ══ -->
+  <main class="screen" id="results-screen">
+    <div class="results-card">
+      <div class="results-score-ring" id="results-ring">
+        <div class="results-score-inner">
+          <div class="results-percent" id="results-percent">0%</div>
+          <div class="results-label">Puntaje</div>
+        </div>
+      </div>
+      <div class="results-title" id="results-title">¡Buen trabajo!</div>
+      <div class="results-sub" id="results-sub"></div>
+      <div class="results-breakdown">
+        <div class="rb-item g"><div class="rb-val" id="rb-correct">0</div><div class="rb-lab">✅ Correctas</div></div>
+        <div class="rb-item r"><div class="rb-val" id="rb-wrong">0</div><div class="rb-lab">❌ Incorrectas</div></div>
+        <div class="rb-item y"><div class="rb-val" id="rb-skipped">0</div><div class="rb-lab">⏩ Sin responder</div></div>
+      </div>
+      <div class="results-actions">
+        <button class="btn btn-primary" id="btn-retry-all">🔄 Repetir este cuestionario</button>
+        <button class="btn btn-ghost" id="btn-retry-wrong">🎯 Solo errores</button>
+        <button class="btn btn-ghost" id="btn-home-results">🏠 Volver al inicio</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══ BOOKMARKS SCREEN ══ -->
+  <main class="screen" id="bookmarks-screen">
+    <div class="bookmarks-header">
+      <h2>🔖 Preguntas Marcadas</h2>
+      <p>Haz clic en una pregunta para ir directamente a ella, o inicia un cuestionario solo con las marcadas.</p>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" id="btn-study-bookmarks">📖 Estudiar marcadas</button>
+        <button class="btn btn-ghost btn-sm" id="btn-clear-bookmarks">🗑️ Limpiar marcadas</button>
+        <button class="btn btn-ghost btn-sm" id="btn-back-home-bk">← Volver</button>
+      </div>
+    </div>
+    <div class="bookmarks-list" id="bookmarks-list"></div>
+  </main>
+
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ MODAL CONFIRMACIÓN ══ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3 id="modal-title">¿Seguro?</h3>
+    <p id="modal-body">Esta acción no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-cancel">Cancelar</button>
+      <button class="btn btn-danger" id="modal-confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS MODAL ══ -->
+<div class="modal-overlay" id="settings-overlay">
+  <div class="modal" style="max-width:480px">
+    <h3>⚙️ Ajustes</h3>
+    <div style="margin-top:16px;">
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Mezclar preguntas</div>
+          <div class="setting-sub">Aleatoriza el orden en cada sesión</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="toggle-shuffle"><span class="toggle-track"></span></label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Mezclar opciones</div>
+          <div class="setting-sub">Aleatoriza las respuestas de cada pregunta</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="toggle-shuffle-opts"><span class="toggle-track"></span></label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Avance automático</div>
+          <div class="setting-sub">Pasa sola a la siguiente tras responder</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="toggle-auto-advance"><span class="toggle-track"></span></label>
+      </div>
+      <div class="setting-row" style="border-bottom:none;margin-top:8px;">
+        <button class="btn btn-danger btn-sm" id="btn-reset-all">🗑️ Borrar todo el progreso</button>
+        <button class="btn btn-ghost btn-sm" id="btn-close-settings">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   DATA — 50 preguntas extraídas del archivo MD
+══════════════════════════════════════════════════ */
+const QUESTIONS_RAW = [
+  {
+    q: "¿Qué afirmación resume el concepto fundamental del \"Embudo de Saneamiento de Datos\" explicado en la arquitectura Kotlin para Jetpack Compose?",
+    opts: [
+      "Los objetos crudos evaden al compilador K2 a través de un puente asíncrono para aumentar su rendimiento a costa del NullPointerException.",
+      "Los datos de la red entran como Singletons (`object`) y terminan renderizados en XML tradicional.",
+      "Toda la información de la base de datos se almacena dinámicamente usando sentencias `var` mutables para un repintado en vivo más fluido.",
+      "Los datos en bruto pasan estrictamente a través de filtros de Inmutabilidad (Data Classes) y Seguridad frente a Nulos (Null Safety) antes de llegar como \"UI State\" puro a la vista."
+    ],
+    correct: 3,
+    feedback: "El \"Embudo de Saneamiento de Datos\" consiste en que los datos crudos atraviesan filtros de **inmutabilidad** y **null safety** antes de convertirse en UI State puro para la vista. Esto garantiza que la UI nunca recibe datos sucios o potencialmente nulos.",
+    tags: ["Arquitectura", "Jetpack Compose", "Null Safety"]
+  },
+  {
+    q: "¿Cuál es la premisa fundamental que diferencia el enfoque de Programación Funcional en Kotlin frente a la programación imperativa en Java puro?",
+    opts: [
+      "La Programación Funcional en Kotlin compila forzosamente hacia lenguaje interpretado.",
+      "En Kotlin, las funciones son \"Ciudadanos de Primera Clase\", lo que significa que pueden almacenarse, pasarse por parámetro o devolverse como resultados de la misma manera que una variable ordinaria.",
+      "En Java las funciones existen fuera de cualquier clase u objeto principal (Top-Level).",
+      "En Kotlin las funciones operan siempre con estados directamente variables (`var`)."
+    ],
+    correct: 1,
+    feedback: "En Kotlin las funciones son **ciudadanos de primera clase**: pueden tratarse como valores, pasarse como argumentos y devolverse como resultados. Esto habilita lambdas, funciones de orden superior y la programación funcional real.",
+    tags: ["Programación Funcional", "Kotlin Básico"]
+  },
+  {
+    q: "En Kotlin, ¿qué capacidad del compilador elimina la redundancia visual al no requerir que se declare el tipo de forma explícita si el contexto es evidente (ej. `val age = 25`)?",
+    opts: [
+      "Manejo Seguro de Nulos",
+      "Smart Casting",
+      "Inferencia de Tipos",
+      "Platform Typing"
+    ],
+    correct: 2,
+    feedback: "La **Inferencia de Tipos** permite que el compilador deduzca el tipo a partir del valor asignado (`val age = 25` → el compilador sabe que es `Int`). Esto elimina redundancia sin perder seguridad de tipos.",
+    tags: ["Kotlin Básico", "Compilador"]
+  },
+  {
+    q: "¿Qué representa una lambda en Kotlin?",
+    opts: [
+      "Una función anónima que puede ser tratada como un valor.",
+      "Una clase que implementa una interfaz funcional.",
+      "Un tipo especial de variable inmutable.",
+      "Un método estático dentro de un objeto."
+    ],
+    correct: 0,
+    feedback: "Una **lambda** es una función anónima que puede almacenarse en una variable, pasarse como argumento o devolverse como resultado. Sintaxis: `{ param -> cuerpo }`. Son clave para la programación funcional en Kotlin.",
+    tags: ["Lambda", "Programación Funcional"]
+  },
+  {
+    q: "¿Cuál es el mecanismo de comunicación entre procesos (IPC) de alto rendimiento en Android que sirve como el \"corazón\" de su sistema nervioso?",
+    opts: [
+      "Mach Ports",
+      "Binder",
+      "URL Schemes",
+      "XNU Data Pipes"
+    ],
+    correct: 1,
+    feedback: "**Binder** es el mecanismo IPC (Inter-Process Communication) de alto rendimiento de Android. Permite que los procesos se comuniquen de forma segura y eficiente. Es la base de los Services, los Content Providers y el sistema de permisos.",
+    tags: ["Android OS", "IPC", "Binder"]
+  },
+  {
+    q: "¿Cuál es la arquitectura subyacente del sistema operativo Android en su capa más profunda?",
+    opts: [
+      "Un entorno de ejecución puramente nativo.",
+      "Un microkernel modular gestionado por Mach.",
+      "Un kernel híbrido basado en Darwin.",
+      "Un kernel monolítico basado en Linux."
+    ],
+    correct: 3,
+    feedback: "Android se basa en un **kernel monolítico Linux** en su capa más profunda. Sobre él se construyen las capas de HAL, ART, librerías nativas y finalmente el framework de aplicaciones. Diferencia clave: iOS usa un kernel híbrido XNU (basado en Mach + BSD).",
+    tags: ["Android OS", "Kernel"]
+  },
+  {
+    q: "Para permitir código declarativo limpio (como en Jetpack Compose con `Button(onClick = { /* lógica */ })`), Kotlin implementa una sintaxis idiomática cuando la lambda es el último parámetro de una función. ¿Cómo se denomina esto?",
+    opts: [
+      "Destructuring Declaration",
+      "Trailing Lambda (Lambda fuera de los paréntesis)",
+      "Inlining Funcional",
+      "Smart Casting Condicional"
+    ],
+    correct: 1,
+    feedback: "La sintaxis de **Trailing Lambda** permite escribir la lambda fuera de los paréntesis cuando es el último parámetro. Esto hace el código de Compose extremadamente legible: `Button(onClick = {}) { Text(\"OK\") }` en lugar de `Button(onClick = {}, content = { Text(\"OK\") })`.",
+    tags: ["Kotlin Idiomático", "Jetpack Compose", "Lambda"]
+  },
+  {
+    q: "En 2026, ¿qué modelo de compilación utiliza el Android Runtime (ART) para equilibrar el tiempo de instalación, espacio en disco y rendimiento de ejecución?",
+    opts: [
+      "Un sistema puramente interpretado en tiempo real sin almacenamiento en disco.",
+      "Ejecución 100% nativa antes de la distribución.",
+      "Un modelo de compilación híbrido que combina Just-In-Time (JIT) y Ahead-Of-Time (AOT).",
+      "Generación exclusiva de código máquina nativo a través de compilación LLVM."
+    ],
+    correct: 2,
+    feedback: "ART usa un **modelo híbrido JIT + AOT**: JIT (Just-In-Time) compila en tiempo de ejecución para instalaciones rápidas, y AOT (Ahead-Of-Time) precompila el código más usado para máximo rendimiento. Profile Guided Optimization (PGO) decide qué compilar con AOT.",
+    tags: ["Android Runtime", "ART", "JIT", "AOT"]
+  },
+  {
+    q: "¿Cuál de las siguientes características distingue a un `data class` en Kotlin?",
+    opts: [
+      "No puede tener propiedades en el constructor.",
+      "Solo puede contener funciones abstractas.",
+      "Permite heredar de múltiples clases.",
+      "Genera automáticamente `equals()`, `hashCode()` y `toString()`."
+    ],
+    correct: 3,
+    feedback: "Una **data class** genera automáticamente: `equals()` (comparación por valor), `hashCode()` (consistente con equals), `toString()` (representación legible), `copy()` (clonar con cambios), y `componentN()` (destructuring). Son ideales para modelos de datos inmutables.",
+    tags: ["Data Class", "Kotlin Básico"]
+  },
+  {
+    q: "En las buenas prácticas de arquitectura en Kotlin, es considerado perjudicial y un \"Code Smell\" el anidar múltiples bloques `let` o `run` consecutivos, ¿por qué?",
+    opts: [
+      "Porque provocan bloqueos permanentes de subprocesos impidiendo que el recolector de basura vacíe memoria.",
+      "Porque detienen inmediatamente la propagación de corrutinas dentro de las sealed classes.",
+      "Porque esto genera confusión cognitiva al mezclarse internamente referencias anónimas múltiples (ya no se sabe a qué se refiere `it` o `this`).",
+      "Porque el Android Runtime (ART) los ignorará si se interrumpe la conexión a internet."
+    ],
+    correct: 2,
+    feedback: "Anidar múltiples `let`/`run` genera **confusión cognitiva**: si anidas dos `let`, el `it` interno ya no se refiere al mismo objeto que el externo, y no queda claro a qué objeto se hace referencia. Se recomienda usar variables con nombre o refactorizar en funciones separadas.",
+    tags: ["Scope Functions", "Buenas Prácticas", "Code Smell"]
+  },
+  {
+    q: "Si necesitamos acceder al objeto mediante el identificador `it` para ejecutar un efecto secundario (como loggear su estado o almacenar un registro), pero deseamos continuar la cadena de ejecución sin alterar el retorno del objeto original, ¿qué Scope Function corresponde?",
+    opts: [
+      "`apply`",
+      "`run`",
+      "`also`",
+      "`let`"
+    ],
+    correct: 2,
+    feedback: "**`also`** es la Scope Function correcta: recibe el objeto como `it`, permite efectos secundarios (logging, debugging) y **devuelve el objeto original** (no el resultado del bloque). Útil en cadenas: `val user = createUser().also { log(it) }.also { db.save(it) }`.",
+    tags: ["Scope Functions", "also"]
+  },
+  {
+    q: "En Kotlin 2.0, si validas `if (obj is String)`, ¿qué mecanismo del compilador permite utilizar los métodos de `String` directamente dentro del bloque sin hacer conversiones forzadas manuales?",
+    opts: [
+      "Inline Functions",
+      "Type Erasure",
+      "Smart Casts (Moldeado Inteligente)",
+      "Null Safety"
+    ],
+    correct: 2,
+    feedback: "**Smart Casts** permiten que el compilador trate a `obj` como `String` dentro del bloque luego de la verificación `is`. En Kotlin 2.0 (compilador K2), esto es aún más potente e incluye casos más complejos como variables de miembro de clase o verificaciones en lambdas.",
+    tags: ["Smart Casts", "Kotlin 2.0", "K2"]
+  },
+  {
+    q: "Al procesar un dato proveniente de una fuente insegura (como una API web), si se desea transformar el valor en un modelo UI únicamente en caso de que sea no nulo (encadenando `?.`) y devolver el nuevo resultado renderizado accediendo mediante el alias `it`, ¿qué Scope Function idiomática es obligatoria?",
+    opts: [
+      "`also`",
+      "`with`",
+      "`apply`",
+      "`let`"
+    ],
+    correct: 3,
+    feedback: "**`?.let { ... }`** es el patrón idiomático: `val uiModel = apiResponse?.let { mapToUiModel(it) }`. Solo ejecuta el bloque si el valor no es nulo, recibe el objeto como `it`, y devuelve el resultado de la transformación (no el objeto original). Es el estándar para transformación segura.",
+    tags: ["Scope Functions", "let", "Null Safety"]
+  },
+  {
+    q: "¿Cuál de las siguientes características distingue a un `data class` en Kotlin?",
+    opts: [
+      "Genera automáticamente `equals()`, `hashCode()` y `toString()`.",
+      "Solo puede contener funciones abstractas.",
+      "Permite heredar de múltiples clases.",
+      "No puede tener propiedades en el constructor."
+    ],
+    correct: 0,
+    feedback: "Las **data classes** son contenedores de datos con métodos autogenerados. `equals()` compara por valor de propiedades (no por referencia), `hashCode()` es consistente, y `toString()` muestra los valores de cada campo. Imprescindibles para modelos de dominio en arquitecturas modernas.",
+    tags: ["Data Class", "Kotlin Básico"]
+  },
+  {
+    q: "En el mecanismo de seguridad \"Sandboxing\", ¿cómo engaña el sistema operativo Android a cada aplicación para garantizar el aislamiento?",
+    opts: [
+      "Verifica los permisos de acceso en tiempo de compilación.",
+      "Le asigna una URL especial de comunicación que no requiere autenticación.",
+      "Le exige pasar por un puente intermedio de serialización llamado Seatbelt.",
+      "Le asigna un Identificador de Usuario (UID) único haciéndole creer que es el único usuario en el sistema."
+    ],
+    correct: 3,
+    feedback: "Android asigna un **UID único** a cada app y la aísla usando el mecanismo de usuarios de Linux. Cada app cree que es el único usuario del sistema. Para comunicarse con otras apps o servicios del sistema, debe usar Binder IPC, que verifica los permisos explícitamente.",
+    tags: ["Android Security", "Sandbox", "UID"]
+  },
+  {
+    q: "¿Qué es técnicamente una Función de Orden Superior (Higher-Order Function) según los documentos teóricos de Kotlin?",
+    opts: [
+      "Una función que acepta expresiones lambdas como parámetros o que devuelve una función como resultado.",
+      "Una función que, al procesarse en K2, corre con mayor prioridad en el CPU sobre funciones comunes.",
+      "Toda expresión que devuelva siempre un tipo inmutable para ser renderizado con Compose.",
+      "Una función que solo puede invocarse internamente usando recursión compleja."
+    ],
+    correct: 0,
+    feedback: "Una **Función de Orden Superior** recibe funciones como parámetros o devuelve una función. Ejemplos: `filter { it > 0 }`, `map { it * 2 }`, `onClick: () -> Unit`. Son el pilar de la programación funcional y de APIs como Jetpack Compose.",
+    tags: ["Funciones de Orden Superior", "Programación Funcional"]
+  },
+  {
+    q: "Desde Kotlin 1.5, además de `sealed classes`, el lenguaje introdujo `sealed interfaces`. ¿Cuál es su caso de uso ideal frente a las clases selladas tradicionales?",
+    opts: [
+      "Modelar entidades de diseño de pantalla que requieren valores mutables constantes.",
+      "Actuar únicamente como clases de almacenamiento sin comportamiento en Kotlin Multiplatform.",
+      "Modelar comportamientos de tipo transversal (ej. un `TimeoutError` que también implementa la interfaz `RetryableError`).",
+      "Declarar métodos `static` de acceso global para compartir memoria caché."
+    ],
+    correct: 2,
+    feedback: "Las **sealed interfaces** permiten que un subtipo implemente múltiples interfaces selladas a la vez. Ejemplo: `class TimeoutError : NetworkError, RetryableError`. Esto es imposible con `sealed class` (Kotlin no permite herencia múltiple de clases). Son clave en arquitecturas complejas.",
+    tags: ["Sealed Interface", "Sealed Class", "Kotlin Avanzado"]
+  },
+  {
+    q: "En arquitecturas reactivas (como Jetpack Compose), es vital modificar estados creando nuevas instancias en vez de alterar las existentes (estabilidad de estado). ¿Qué método autogenerado en una `data class` hace esto posible de manera simple?",
+    opts: [
+      "`componentN()`",
+      "`equals()`",
+      "`hashCode()`",
+      "`copy()`"
+    ],
+    correct: 3,
+    feedback: "**`copy()`** permite crear una nueva instancia modificando solo las propiedades deseadas: `val newState = state.copy(isLoading = false, data = result)`. Esto es fundamental en Compose/MVI: nunca mutamos el estado, siempre creamos uno nuevo, lo que garantiza recomposición predecible.",
+    tags: ["Data Class", "copy()", "Jetpack Compose", "Inmutabilidad"]
+  },
+  {
+    q: "Cuando se utiliza `when` como EXPRESIÓN (devolviendo un valor), ¿qué regla exige implacablemente el compilador de Kotlin para evitar comportamientos impredecibles?",
+    opts: [
+      "Que el resultado se evalúe de manera paralela en múltiples hilos concurrentes.",
+      "Que cada caso solo evalúe valores de variables inmutables creadas por `let`.",
+      "Que la expresión no use la palabra reservada `else`.",
+      "Que la exhaustividad sea completa (es obligatorio cubrir todos los casos posibles o colocar un bloque `else`)."
+    ],
+    correct: 3,
+    feedback: "Cuando `when` se usa como **expresión** (asignando su resultado a una variable), el compilador exige **exhaustividad total**: todos los casos deben cubrirse o debe existir un `else`. Con `sealed classes`, si añades un nuevo subtipo y no lo cubres en el `when`, el código no compila — el \"Escudo del Compilador\".",
+    tags: ["when", "Exhaustividad", "Sealed Class"]
+  },
+  {
+    q: "¿Cuál es la principal diferencia entre el paradigma imperativo y el declarativo?",
+    opts: [
+      "El imperativo describe qué se quiere lograr sin indicar cómo hacerlo.",
+      "El declarativo obliga a usar programación orientada a objetos.",
+      "El declarativo se enfoca en describir paso a paso cómo resolver un problema.",
+      "El imperativo indica cómo lograr un resultado mediante instrucciones explícitas."
+    ],
+    correct: 3,
+    feedback: "**Imperativo**: describes el **cómo** paso a paso (bucles, if/else, mutaciones de estado). **Declarativo**: describes el **qué** deseas (SQL, HTML, Jetpack Compose). Kotlin permite ambos estilos: `for` loops (imperativo) vs `list.filter { }.map { }` (declarativo/funcional).",
+    tags: ["Paradigmas", "Imperativo", "Declarativo"]
+  },
+  {
+    q: "¿Qué diferencia radical existe entre un clásico `enum` en Java/Kotlin y una `sealed class` moderna en Kotlin?",
+    opts: [
+      "La `sealed class` es más difícil de evaluar en una expresión `when` que un `enum` simple.",
+      "El `enum` solo maneja valores cerrados sin datos adicionales; la `sealed class` es una jerarquía que permite que cada estado contenga un modelo de datos complejo y distinto.",
+      "El `enum` consume memoria excesiva; la `sealed class` se aloja en el procesador.",
+      "El `enum` es compatible con Compose y la `sealed class` solo funciona en capas de backend."
+    ],
+    correct: 1,
+    feedback: "Un **enum** es una lista de constantes sin datos adicionales. Una **sealed class** permite que cada subtipo sea una clase distinta con sus propios datos: `sealed class Result { data class Success(val data: T) : Result() ; data class Error(val msg: String) : Result() }`. Perfecto para modelar estados de red.",
+    tags: ["Sealed Class", "Enum", "Modelado de Estado"]
+  },
+  {
+    q: "¿Qué ventaja aporta el uso de `Extension Functions` (Funciones de Extensión) en una arquitectura de software limpia en Kotlin?",
+    opts: [
+      "Evitan que se utilice el Operador Elvis obligando al programador a reescribir utilitarios estáticos complejos.",
+      "Generan herencia forzada en las bibliotecas de Jetpack Compose haciendo que cada botón deba derivar de un componente raíz.",
+      "Permiten \"pegar\" nuevo comportamiento, validaciones o utilidades directamente a tipos estándar y clases cerradas (como `String` o `Int`) sin usar herencia tradicional ni \"contaminar\" las clases de dominio.",
+      "Requieren que se acceda directamente al núcleo del sistema operativo Android y modifiquen las directrices de Binder IPC."
+    ],
+    correct: 2,
+    feedback: "Las **Extension Functions** añaden comportamiento a tipos existentes sin herencia: `fun String.isValidEmail() = contains(\"@\")`. Esto mantiene las clases de dominio limpias y permite utilidades reutilizables sin jerarquías artificiales. No modifican la clase original — el compilador las traduce a funciones estáticas.",
+    tags: ["Extension Functions", "Kotlin Idiomático"]
+  },
+  {
+    q: "Según el análisis del ecosistema móvil en 2026, ¿qué tendencia describe el fenómeno de la \"Premiumización\"?",
+    opts: [
+      "La renovación de dispositivos hacia modelos con mejor hardware capaz de procesar IA y Realidad Aumentada localmente.",
+      "La migración de todos los usuarios de la gama media hacia plataformas basadas en la nube.",
+      "La eliminación total del entorno de ejecución mixto en dispositivos móviles básicos.",
+      "El abandono definitivo de Android en favor del sistema operativo iOS a nivel mundial."
+    ],
+    correct: 0,
+    feedback: "La **Premiumización** se refiere a la tendencia de que los usuarios renuevan sus dispositivos hacia modelos con **mejor hardware** capaz de procesar IA generativa y Realidad Aumentada localmente (on-device). Esto genera nuevas oportunidades para apps que aprovechen estas capacidades.",
+    tags: ["Ecosistema Móvil 2026", "Tendencias"]
+  },
+  {
+    q: "¿Qué representa una lambda en Kotlin?",
+    opts: [
+      "Una función anónima que puede ser tratada como un valor.",
+      "Una clase que implementa una interfaz funcional.",
+      "Un tipo especial de variable inmutable.",
+      "Un método estático dentro de un objeto."
+    ],
+    correct: 0,
+    feedback: "Una **lambda** es una función anónima almacenable como valor. Sintaxis: `val suma: (Int, Int) -> Int = { a, b -> a + b }`. Son la base de las funciones de orden superior, los Scope Functions y la API de Jetpack Compose.",
+    tags: ["Lambda", "Programación Funcional"]
+  },
+  {
+    q: "¿Cuál es la principal diferencia entre el paradigma imperativo y el declarativo?",
+    opts: [
+      "El declarativo se enfoca en describir paso a paso cómo resolver un problema.",
+      "El imperativo describe qué se quiere lograr sin indicar cómo hacerlo.",
+      "El imperativo indica cómo lograr un resultado mediante instrucciones explícitas.",
+      "El declarativo obliga a usar programación orientada a objetos."
+    ],
+    correct: 2,
+    feedback: "El **paradigma imperativo** indica explícitamente el **cómo**: asignaciones, bucles, condiciones paso a paso. El **declarativo** describe el **qué**: SQL (`SELECT * FROM users`), Compose (`Text(\"Hola\")`). Kotlin soporta ambos, y Jetpack Compose es el ejemplo más claro del paradigma declarativo en Android.",
+    tags: ["Paradigmas", "Imperativo", "Declarativo"]
+  },
+  {
+    q: "Para solucionar el histórico problema del `NullPointerException` en entornos de producción, ¿cómo aborda Kotlin el problema desde su raíz?",
+    opts: [
+      "Agregando múltiples sentencias obligatorias `try/catch` de forma automática e invisible.",
+      "Delegando al desarrollador la comprobación manual a través de estructuras `if (variable != null)`.",
+      "Creando clases anónimas por cada propiedad potencialmente inestable.",
+      "Integrando la nulidad en el Sistema de Tipos (por defecto, las variables NO aceptan nulos)."
+    ],
+    correct: 3,
+    feedback: "Kotlin integra la nulidad en el **sistema de tipos**: `String` nunca puede ser null, `String?` sí puede serlo. El compilador **exige** manejar explícitamente la nulidad antes de compilar. Esto reduce ~20% los crashes por NPE en producción comparado con Java.",
+    tags: ["Null Safety", "Sistema de Tipos"]
+  },
+  {
+    q: "Analizando los lenguajes Kotlin y Swift en la plataforma móvil (KMP), ¿qué mecanismo en Swift es análogo directo a declarar una variable nula `String?` en Kotlin?",
+    opts: [
+      "Variables estáticas compartidas",
+      "El tipo `Optional<String>`",
+      "Forced Unwrapping",
+      "Nil-Coalescing"
+    ],
+    correct: 1,
+    feedback: "En Swift, **`Optional<String>`** (también escrito `String?`) es el análogo directo a `String?` en Kotlin. Ambos representan \"este valor puede ser nulo\". Diferencia: en Swift se usa `if let`, `guard let` o `??` para manejarlos; en Kotlin se usan `?.`, `?:` y `let { }`.",
+    tags: ["Null Safety", "Swift vs Kotlin", "KMP"]
+  },
+  {
+    q: "A diferencia de todas las otras Scope Functions de Kotlin, ¿cuál de ellas es invocada como una función independiente normal que recibe el objeto explícitamente como argumento, en vez de llamarse como una función de extensión con el punto (`.`)?",
+    opts: [
+      "`run`",
+      "`with`",
+      "`also`",
+      "`apply`"
+    ],
+    correct: 1,
+    feedback: "**`with`** es la única que no es una función de extensión: `with(myObject) { doSomething() }`. Las demás se llaman con punto: `myObject.let { }`, `myObject.run { }`, etc. `with` es ideal cuando ya tienes el objeto y quieres llamar múltiples métodos sin repetir su nombre.",
+    tags: ["Scope Functions", "with"]
+  },
+  {
+    q: "Deseamos tomar un nuevo objeto instanciado, configurarlo aplicándole múltiples propiedades inmediatamente y devolver esa misma entidad modificada. El contexto ideal de esta función requerirá llamar directamente las propiedades del objeto (sin `it.`). ¿Qué Scope Function aplica aquí?",
+    opts: [
+      "`let`",
+      "`apply`",
+      "`run`",
+      "`with`"
+    ],
+    correct: 1,
+    feedback: "**`apply`** usa `this` como receptor (puedes llamar propiedades directamente sin prefijo), y **devuelve el objeto original** (no el resultado del bloque). Patrón idiomático: `val btn = Button(context).apply { text = \"OK\"; textSize = 16f; isEnabled = true }`. Es el estándar para builders.",
+    tags: ["Scope Functions", "apply"]
+  },
+  {
+    q: "Cuando declaras `object HttpClientProvider` en Kotlin, ¿qué garantías te brinda automáticamente el compilador en un entorno de concurrencia y subprocesos múltiples?",
+    opts: [
+      "Una inicialización perezosa (lazy) totalmente segura (thread-safe) y que garantiza una única instancia en toda la aplicación.",
+      "La obligación de declarar explícitamente el uso de bloques `synchronized` para evitar bloqueos del sistema.",
+      "Un objeto transitorio que se clona (con `.copy()`) cada vez que un hilo distinto lo invoca.",
+      "Que el objeto solo existirá en memoria RAM hasta que la pantalla (Actividad) se cierre en Android."
+    ],
+    correct: 0,
+    feedback: "La declaración **`object`** crea un **Singleton thread-safe** automáticamente. El compilador genera una inicialización lazy garantizada (usando `INSTANCE` y sincronización a nivel de carga de clase JVM). No necesitas `synchronized` ni implementación manual del patrón Singleton como en Java.",
+    tags: ["Object Declaration", "Singleton", "Thread Safety"]
+  },
+  {
+    q: "Al combinar una clase sellada (`sealed class`) para modelar estados de red (ej. NetworkResult) y la expresión `when` para evaluarla en la UI, ¿qué representa el \"Escudo del Compilador\"?",
+    opts: [
+      "Un entorno (sandbox) en Android Runtime que absorbe fallos lógicos durante el uso del usuario final.",
+      "El proceso de verificación matemática que asegura la exhaustividad total, prohibiendo la compilación si un caso nuevo (ej. `Timeout`) no ha sido manejado explícitamente.",
+      "La obligación algorítmica del compilador de impedir la ejecución si un nuevo estado no ha sido declarado en la clase sellada base.",
+      "La capacidad del compilador de inyectar variables de tipo nulo automáticamente al detectar lentitud."
+    ],
+    correct: 1,
+    feedback: "El **Escudo del Compilador** es que al usar `when` con una `sealed class` como expresión, el compilador verifica **exhaustividad**: si agregas `object Timeout : NetworkResult()` pero no lo manejas en el `when`, el código **no compila**. Esto previene bugs silenciosos al evolucionar el modelo.",
+    tags: ["Sealed Class", "when", "Escudo del Compilador"]
+  },
+  {
+    q: "¿Qué patrón es el estándar idiomático más recomendado en Android moderno para lograr ejecutar código protegido, combinando \"null-safety\", \"smart casting\", transformación y ejecución opcional segura?",
+    opts: [
+      "`!!run { ... }`",
+      "`var as? Class` seguido de `apply`",
+      "`?.let { ... }`",
+      "`if(var != null) { ... }`"
+    ],
+    correct: 2,
+    feedback: "**`?.let { ... }`** es el patrón idiomático de Kotlin para manejo seguro de nulos: `user?.let { showProfile(it) }`. Combina: llamada segura (`?.`), Smart Cast dentro del bloque (garantiza no-nulo), acceso vía `it`, y retorna el resultado o null. Es más conciso y expresivo que `if != null`.",
+    tags: ["Null Safety", "let", "Patrón Idiomático"]
+  },
+  {
+    q: "Al integrar el paradigma Funcional con la Programación Orientada a Objetos en Kotlin para el desarrollo en Android, ¿cómo se posicionan frente a frente?",
+    opts: [
+      "La Programación Funcional solo se utiliza para construir vistas, delegando el manejo real del estado y seguridad de datos a métodos abstractos polimórficos tradicionales de Java.",
+      "Ambos paradigmas se complementan: la OOP modela entidades y arquitecturas mientras la FP transforma los datos y pasa comportamiento de forma segura, inmutable y declarativa.",
+      "La Orientación a Objetos se ha abandonado totalmente tras la llegada de las Lambdas y las Scope Functions de Jetpack Compose.",
+      "La Programación Funcional obliga a desechar las jerarquías de dominios en favor de simples scripts matemáticos y declarativos puros en consola."
+    ],
+    correct: 1,
+    feedback: "En Kotlin, **OOP y FP se complementan**: OOP define las entidades (`User`, `Repository`, `ViewModel`) y la arquitectura. FP transforma datos de forma segura e inmutable (`map`, `filter`, `copy`). La combinación es el estándar de Android moderno: arquitectura MVVM + Clean Architecture + Compose.",
+    tags: ["OOP", "Programación Funcional", "Arquitectura"]
+  },
+  {
+    q: "Al procesar respuestas de APIs o modelos de datos anidados, ¿qué operador se utiliza para detener la evaluación inmediatamente (cortocircuito) retornando null si algún eslabón es nulo, sin producir una excepción?",
+    opts: [
+      "Operador de Aserción No Nula (!!)",
+      "Operador de Llamada Segura (?.)",
+      "Operador Elvis (?:)",
+      "Smart Casts (is)"
+    ],
+    correct: 1,
+    feedback: "El **Operador de Llamada Segura `?.`** evalúa la cadena y si cualquier parte es null, **detiene y devuelve null** sin lanzar excepción: `user?.address?.city?.uppercase()`. Si `user` es null, el resultado es null, no un NPE. Ideal para APIs con respuestas JSON anidadas opcionales.",
+    tags: ["Null Safety", "Operador ?.", "Safe Call"]
+  },
+  {
+    q: "Si comparamos el impacto directo medible del sistema de tipos seguro de Kotlin en los proyectos Android modernos frente a los desarrollados exclusivamente en Java, ¿cuál es un beneficio estadístico validado en la industria?",
+    opts: [
+      "La anulación absoluta del consumo de datos en red al usar lambdas optimizadas por el compilador AOT de Android 16.",
+      "Una reducción probada de casi el 20% en la probabilidad de \"crashes\" (cierres inesperados) en producción gracias a la detección temprana del compilador de los errores de referencia nula.",
+      "Un ahorro del 94% del espacio total en disco del sistema de archivos al compilar los proyectos.",
+      "Un rendimiento un 50% superior al ejecutar Garbage Collection en gamas medias locales en Latinoamérica."
+    ],
+    correct: 1,
+    feedback: "Google y estudios de la industria han validado que Kotlin reduce aproximadamente un **20% los crashes por NPE** en producción. Esto es por la detección en tiempo de compilación. El 94% es la mejora de velocidad del compilador K2 (no del tamaño en disco), y el 50% de GC no es una cifra real.",
+    tags: ["Kotlin vs Java", "Null Safety", "Estadísticas"]
+  },
+  {
+    q: "Para elegir correctamente entre las \"Scope Functions\" del lenguaje Kotlin (`apply`, `run`, `with`, `let`, `also`), se deben contestar dos preguntas fundamentales. ¿Cuáles son?",
+    opts: [
+      "¿Cómo quiero acceder al objeto dentro del bloque (`this` o `it`)? y ¿Qué necesito que devuelva la función (el objeto original o el resultado del cálculo)?",
+      "¿El valor a evaluar proviene de red o base de datos local? y ¿Será procesado en JIT o AOT?",
+      "¿El objeto es de un tipo Platform (`!`) o Nullable (`?`)? y ¿Qué estado sellado lo engloba?",
+      "¿El proyecto fue iniciado con \"Kotlin-First\" o migrado desde Java heredado? y ¿Utiliza Jetpack Compose?"
+    ],
+    correct: 0,
+    feedback: "Las dos preguntas clave son: **1) Acceso**: ¿necesito `this` (apply, run, with) para llamar propiedades directamente, o `it` (let, also) para transformación o efecto secundario? **2) Retorno**: ¿necesito el objeto original (apply, also) o el resultado del bloque (let, run, with)?",
+    tags: ["Scope Functions", "Guía de Selección"]
+  },
+  {
+    q: "¿Por qué adoptó Google la filosofía \"Kotlin-First\" como estándar mandatorio para el ecosistema Android?",
+    opts: [
+      "Porque Kotlin reduce el ruido sintáctico (boilerplate) permitiendo que la lógica de negocio resalte y se disminuya la deuda técnica.",
+      "Porque es el único lenguaje que el compilador LLVM puede leer.",
+      "Para reemplazar por completo y eliminar el uso de la Máquina Virtual de Java (JVM).",
+      "Porque Kotlin compila mucho más rápido que Java convirtiendo las aplicaciones en ejecutables iOS."
+    ],
+    correct: 0,
+    feedback: "Google adoptó **Kotlin-First** porque Kotlin: reduce drásticamente el **boilerplate** (getters/setters, null checks, toString...), mejora la legibilidad, aumenta la productividad del desarrollador, y reduce la deuda técnica. Kotlin **sigue usando la JVM** — es completamente interoperable con Java.",
+    tags: ["Kotlin-First", "Kotlin vs Java", "Google"]
+  },
+  {
+    q: "¿Qué concepto utiliza Kotlin para reemplazar definitivamente a los miembros `static` del lenguaje Java, eliminando la compleja necesidad de sincronizar el código defensivo multihilo?",
+    opts: [
+      "La clase `data class Singleton`",
+      "Las Funciones de Orden Superior",
+      "Las Extension Functions",
+      "La declaración `object` (El Patrón Singleton Nativo)"
+    ],
+    correct: 3,
+    feedback: "La declaración **`object`** reemplaza a `static` en Java. En Java, los miembros estáticos requieren sincronización manual para ser thread-safe. En Kotlin, `object MyUtils { fun helper() {} }` crea un Singleton garantizado thread-safe por el compilador. También se usa como `companion object` dentro de clases.",
+    tags: ["Object Declaration", "Companion Object", "Static"]
+  },
+  {
+    q: "¿Qué salto arquitectónico introduce el nuevo compilador K2 de Kotlin 2.0+ en comparación con el K1 (Legacy)?",
+    opts: [
+      "Reemplaza el uso de la memoria virtual en favor del compilador Ahead-Of-Time exclusivamente.",
+      "Exige la mutabilidad por defecto en todas las funciones declaradas.",
+      "Presenta una arquitectura unificada (FIR) que permite hasta un 94% más de velocidad en compilaciones limpias e inferencia semántica inteligente.",
+      "Elimina las corrutinas en favor de la gestión manual de hilos del procesador."
+    ],
+    correct: 2,
+    feedback: "El compilador **K2** introduce la arquitectura **FIR (Frontend Intermediate Representation)** unificada: hasta **94% más velocidad** en compilaciones limpias, mejor inferencia de tipos, Smart Casts más potentes y soporte unificado para todas las plataformas (JVM, JS, Native, Wasm). Es el mayor avance del compilador desde Kotlin 1.0.",
+    tags: ["K2", "Kotlin 2.0", "Compilador FIR"]
+  },
+  {
+    q: "Cuando Kotlin consume un método de Java que carece de anotaciones de nulidad (`@Nullable` o `@NotNull`), ¿qué tipo de dato problemático le asigna el compilador?",
+    opts: [
+      "Tipo estrictamente seguro (String)",
+      "Platform Type o Tipo de Plataforma (String!)",
+      "Tipo Opcional (Optional)",
+      "Tipo anulable por defecto (String?)"
+    ],
+    correct: 1,
+    feedback: "**Platform Type** (`String!`) es asignado por Kotlin cuando el código Java no tiene anotaciones de nulidad. El `!` significa \"podría ser nulo o no nulo, no lo sé\". El compilador no puede verificarlo, así que es responsabilidad del desarrollador. Es un riesgo de NPE en interoperabilidad Java-Kotlin.",
+    tags: ["Interoperabilidad Java", "Platform Type", "Null Safety"]
+  },
+  {
+    q: "El uso intensivo de lambdas en funciones de colección (como `.filter`, `.map`) crearía numerosos objetos en memoria en Java. Para evitar este costo de rendimiento sin sacrificar código idiomático en Kotlin, ¿qué modificador se utiliza en la declaración de estas funciones de orden superior?",
+    opts: [
+      "`crossinline`",
+      "`reified`",
+      "`inline`",
+      "`suspend`"
+    ],
+    correct: 2,
+    feedback: "El modificador **`inline`** hace que el compilador **copie el cuerpo de la función y la lambda** en el sitio de llamada, eliminando la creación de objetos lambda. Esto es por qué `filter`, `map`, `forEach` son tan eficientes en Kotlin. El costo es mayor tamaño de bytecode, pero el beneficio de rendimiento lo justifica.",
+    tags: ["inline", "Performance", "Lambda", "Funciones de Orden Superior"]
+  },
+  {
+    q: "¿Qué sintaxis indica que una variable pertenece al conjunto de tipos que sí tienen capacidad de contener la ausencia de valor en Kotlin?",
+    opts: [
+      "La anotación `@Nullable` antes del tipo de variable.",
+      "El sufijo de un signo de interrogación (ej. `String?`).",
+      "La palabra reservada `optional`.",
+      "El sufijo del signo de exclamación (ej. `String!`)."
+    ],
+    correct: 1,
+    feedback: "El sufijo **`?`** indica un tipo nullable: `String?` puede ser `null`, `String` nunca puede serlo. `String!` es un Platform Type (de Java sin anotaciones, no es Kotlin puro). `@Nullable` es una anotación Java. Kotlin no tiene la palabra `optional` — eso es Swift/Java.",
+    tags: ["Null Safety", "Tipos Nullable", "Sintaxis"]
+  },
+  {
+    q: "¿Qué define una función de orden superior?",
+    opts: [
+      "Una función que solo puede ejecutarse dentro de una coroutine.",
+      "Una función que recibe o devuelve otra función.",
+      "Una función que no puede tener parámetros.",
+      "Una función que se ejecuta únicamente en tiempo de compilación."
+    ],
+    correct: 1,
+    feedback: "Una **función de orden superior** recibe funciones como parámetros o devuelve funciones. Ejemplo: `fun transform(list: List<Int>, fn: (Int) -> Int): List<Int> = list.map(fn)`. Son el corazón de la API de colecciones de Kotlin y de Jetpack Compose.",
+    tags: ["Funciones de Orden Superior", "Definición"]
+  },
+  {
+    q: "A diferencia de Android que utiliza \"Garbage Collection\", ¿qué sistema utiliza iOS para liberar la memoria en el instante exacto en que un objeto deja de usarse?",
+    opts: [
+      "Low Memory Killer (LMK)",
+      "Just-In-Time Compiler (JIT)",
+      "Profile Guided Optimization (PGO)",
+      "Automatic Reference Counting (ARC)"
+    ],
+    correct: 3,
+    feedback: "iOS usa **ARC (Automatic Reference Counting)**: cada objeto tiene un contador de referencias; cuando llega a 0, se libera inmediatamente. Android usa **Garbage Collection** (GC): un proceso periódico que puede causar pausas (GC pauses). ARC es más predecible, GC puede manejar ciclos de referencia automáticamente.",
+    tags: ["iOS vs Android", "Gestión de Memoria", "ARC", "GC"]
+  },
+  {
+    q: "¿Por qué el operador de Aserción No Nula (`!!`) se considera una mala práctica y un \"Code Smell\" en ingeniería móvil?",
+    opts: [
+      "Porque fuerza a tratar un valor anulable como seguro, lanzando inmediatamente un `NullPointerException` si la suposición falla.",
+      "Porque ignora por completo la eficiencia de consumo de batería de ART (Android Runtime).",
+      "Porque obliga al compilador K2 a deshabilitar la inferencia de tipos general.",
+      "Porque hace que el código compilado no sea compatible con dispositivos iOS."
+    ],
+    correct: 0,
+    feedback: "El operador **`!!`** es un contrato riesgoso: \"confío en que esto no es null\". Si falla, lanza `KotlinNullPointerException` en tiempo de ejecución — exactamente lo que Kotlin intenta prevenir. En su lugar, usa `?.`, `?:` o `let { }`. `!!` solo se justifica en pruebas unitarias o cuando tienes certeza absoluta del contexto.",
+    tags: ["Null Safety", "!!", "Code Smell", "Buenas Prácticas"]
+  },
+  {
+    q: "¿Qué define una función de orden superior?",
+    opts: [
+      "Una función que recibe o devuelve otra función.",
+      "Una función que se ejecuta únicamente en tiempo de compilación.",
+      "Una función que no puede tener parámetros.",
+      "Una función que solo puede ejecutarse dentro de una coroutine."
+    ],
+    correct: 0,
+    feedback: "Una **función de orden superior** es aquella que **recibe o devuelve otra función**. En Kotlin, el tipo `(Int) -> String` describe una función que toma un Int y devuelve String. Esto habilita patrones como callbacks, DSLs, builders y la API completa de colecciones funcionales.",
+    tags: ["Funciones de Orden Superior", "Definición"]
+  },
+  {
+    q: "¿Cuál es el propósito principal de una extension function en Kotlin?",
+    opts: [
+      "Añadir comportamiento adicional a un tipo sin necesidad de herencia.",
+      "Modificar el código fuente de una clase existente.",
+      "Crear una nueva clase que reemplace a la original.",
+      "Agregar nuevas propiedades almacenadas a un tipo."
+    ],
+    correct: 0,
+    feedback: "Las **Extension Functions** añaden comportamiento a tipos existentes **sin herencia ni modificar la clase original**. Ejemplo: `fun Int.isPrime(): Boolean { ... }` permite llamar `7.isPrime()`. El compilador las traduce a funciones estáticas — no se modifica el bytecode de la clase original.",
+    tags: ["Extension Functions", "Propósito"]
+  },
+  {
+    q: "¿A qué equivalente sintáctico de Kotlin en el manejo de nulos (el Operador Elvis `?:`) corresponde la estructura Nil-Coalescing (`??`) en el lenguaje Swift?",
+    opts: [
+      "Funciones Lambda",
+      "Proveer un valor por defecto o de respaldo en caso de recibir un nulo",
+      "Smart Casting",
+      "Inferencia de Tipos"
+    ],
+    correct: 1,
+    feedback: "Tanto **`?:` (Elvis)** en Kotlin como **`??` (Nil-Coalescing)** en Swift proveen un **valor por defecto si el valor es null/nil**: `val name = user?.name ?: \"Anónimo\"` (Kotlin) | `let name = user?.name ?? \"Anónimo\"` (Swift). Son funcionalmente idénticos y un pilar del manejo seguro de nulos.",
+    tags: ["Operador Elvis", "Null Safety", "Swift vs Kotlin"]
+  },
+  {
+    q: "¿Cuál es la \"Regla de Oro\" respecto a la mutabilidad de las variables recomendada en ingeniería móvil?",
+    opts: [
+      "Utilizar arreglos mutables de Java para asegurar la interoperabilidad con servicios Legacy.",
+      "Usar siempre `var` para no agotar la memoria disponible en el dispositivo.",
+      "Intercambiar entre `val` y `var` dependiendo del tamaño de la clase de datos (data class).",
+      "Siempre declarar con `val` como estado por defecto y cambiar a `var` solo si es estrictamente necesario."
+    ],
+    correct: 3,
+    feedback: "La **Regla de Oro**: usar **`val` por defecto** (inmutable, como `final` en Java) y `var` solo cuando sea estrictamente necesario. La inmutabilidad previene bugs de estado compartido, facilita la programación reactiva (Compose espera estados inmutables) y mejora la legibilidad del código.",
+    tags: ["val vs var", "Inmutabilidad", "Buenas Prácticas"]
+  },
+  {
+    q: "En Kotlin, la sentencia `when` no requiere la instrucción `break` utilizada en el antiguo `switch` de Java. ¿Qué error de diseño humano se elimina completamente con este cambio?",
+    opts: [
+      "El uso innecesario de bucles `for` y `while`.",
+      "El \"Fall-through\", donde por olvido del programador el código \"cae\" al siguiente caso accidentalmente.",
+      "La mutabilidad no deseada generada en las variables de control.",
+      "El desbordamiento de pila (StackOverflow) en funciones recursivas anidadas."
+    ],
+    correct: 1,
+    feedback: "El **Fall-through** en Java: si olvidas el `break`, el `switch` \"cae\" al siguiente case, ejecutando código no intencionado. El `when` de Kotlin elimina esto por diseño — cada rama es independiente. También elimina los `default:` verbosos (usa `else`), y puede usarse como expresión que devuelve un valor.",
+    tags: ["when vs switch", "Fall-through", "Diseño de Lenguaje"]
+  }
+];
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+const STORE_KEY = 'kotlin_quiz_v2';
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
+}
+function saveState() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {}
+}
+
+let state = {
+  bookmarks: [],
+  settings: { shuffle: false, shuffleOpts: false, autoAdvance: false },
+  lastSessionMode: 'all',
+  history: {},   // questionIndex → { answered, correct }
+  ...loadState()
+};
+
+// Ensure structure
+if (!state.bookmarks) state.bookmarks = [];
+if (!state.settings) state.settings = { shuffle: false, shuffleOpts: false, autoAdvance: false };
+if (!state.history) state.history = {};
+
+/* Quiz session */
+let session = {
+  questions: [],        // array of question objects (with optOrder)
+  current: 0,
+  answered: {},         // idx → chosen option index
+  correct: {},          // idx → true/false
+  mode: 'all',
+};
+
+/* ══════════════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════════════ */
+function $(id) { return document.getElementById(id); }
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function showToast(msg, ms = 2000) {
+  const t = $('toast'); t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), ms);
+}
+function formatMD(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+function setScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+/* ══════════════════════════════════════════════════
+   HOME
+══════════════════════════════════════════════════ */
+function updateHome() {
+  const done = Object.keys(state.history).length;
+  $('stat-done').textContent = done || '—';
+  $('stat-bookmarked').textContent = state.bookmarks.length || '—';
+
+  const bkCount = state.bookmarks.length;
+  $('badge-bookmarked').textContent = bkCount;
+  $('badge-bookmarked').style.display = bkCount ? '' : 'none';
+
+  const wrongList = Object.entries(state.history).filter(([,v]) => !v.correct);
+  $('badge-wrong').textContent = wrongList.length;
+  $('badge-wrong').style.display = wrongList.length ? '' : 'none';
+}
+
+/* ══════════════════════════════════════════════════
+   QUIZ INIT
+══════════════════════════════════════════════════ */
+function startQuiz(mode) {
+  session.mode = mode;
+  state.lastSessionMode = mode;
+
+  let pool = QUESTIONS_RAW.map((q, i) => ({ ...q, originalIndex: i }));
+
+  if (mode === 'bookmarked') {
+    pool = pool.filter(q => state.bookmarks.includes(q.originalIndex));
+    if (!pool.length) { showToast('No tienes preguntas marcadas 🔖'); return; }
+    $('mode-tag').textContent = '🔖 Marcadas';
+  } else if (mode === 'wrong') {
+    const wrongIds = Object.entries(state.history)
+      .filter(([,v]) => !v.correct).map(([k]) => parseInt(k));
+    pool = pool.filter(q => wrongIds.includes(q.originalIndex));
+    if (!pool.length) { showToast('¡No tienes errores recientes! 🎉'); return; }
+    $('mode-tag').textContent = '🎯 Errores';
+  } else {
+    $('mode-tag').textContent = '📚 Todas';
+  }
+
+  if (state.settings.shuffle) pool = shuffle(pool);
+
+  // Add option order
+  session.questions = pool.map(q => {
+    const optOrder = q.opts.map((_, i) => i);
+    const shuffled = state.settings.shuffleOpts ? shuffle(optOrder) : optOrder;
+    const newCorrect = shuffled.indexOf(q.correct);
+    return { ...q, optOrder: shuffled, shuffledCorrect: newCorrect };
+  });
+
+  session.current = 0;
+  session.answered = {};
+  session.correct = {};
+
+  buildSidebar();
+  setScreen('quiz-screen');
+  renderQuestion();
+  saveState();
+}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+function buildSidebar() {
+  const sb = $('sidebar');
+  sb.innerHTML = `<div class="sidebar-label">${session.questions.length}Q</div>`;
+  session.questions.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'q-dot';
+    dot.id = `dot-${i}`;
+    dot.textContent = i + 1;
+    dot.title = `Pregunta ${i + 1}`;
+    dot.addEventListener('click', () => goTo(i));
+    sb.appendChild(dot);
+  });
+  updateSidebar();
+}
+
+function updateSidebar() {
+  session.questions.forEach((q, i) => {
+    const dot = $(`dot-${i}`);
+    if (!dot) return;
+    dot.className = 'q-dot';
+    if (i === session.current) dot.classList.add('current');
+    if (i in session.answered) {
+      dot.classList.add(session.correct[i] ? 'answered-correct' : 'answered-wrong');
+    }
+    if (state.bookmarks.includes(q.originalIndex)) dot.classList.add('bookmarked');
+  });
+  // Scroll active dot into view
+  const activeDot = $(`dot-${session.current}`);
+  if (activeDot) activeDot.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER QUESTION
+══════════════════════════════════════════════════ */
+function renderQuestion() {
+  const q = session.questions[session.current];
+  const total = session.questions.length;
+  const answered = Object.keys(session.answered).length;
+  const correct = Object.values(session.correct).filter(Boolean).length;
+  const wrong = answered - correct;
+
+  // Header
+  $('q-number').textContent = `Pregunta ${session.current + 1} de ${total}`;
+  $('prog-text').textContent = `Pregunta ${session.current + 1} de ${total}`;
+  $('prog-score').innerHTML = `✅ ${correct} &nbsp; ❌ ${wrong}`;
+  $('progress-fill').style.width = `${(answered / total) * 100}%`;
+
+  // Bookmark btn
+  const isBookmarked = state.bookmarks.includes(q.originalIndex);
+  $('bookmark-btn').classList.toggle('active', isBookmarked);
+
+  // Question text
+  $('q-text').innerHTML = formatMD(q.q);
+
+  // Options
+  const optContainer = $('options-container');
+  optContainer.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+  q.optOrder.forEach((origIdx, displayIdx) => {
+    const opt = document.createElement('div');
+    opt.className = 'option';
+    opt.dataset.displayIdx = displayIdx;
+    opt.innerHTML = `
+      <div class="option-letter">${letters[displayIdx]}</div>
+      <div class="option-text">${formatMD(q.opts[origIdx])}</div>`;
+
+    if (displayIdx in session.answered) {
+      opt.classList.add('disabled');
+      const chosen = session.answered[session.current];
+      if (displayIdx === chosen) {
+        opt.classList.add(session.correct[session.current] ? 'correct' : 'wrong');
+      }
+      if (displayIdx === q.shuffledCorrect && !session.correct[session.current]) {
+        opt.classList.add('reveal-correct');
+      }
+    } else {
+      opt.addEventListener('click', () => selectOption(displayIdx));
+    }
+
+    optContainer.appendChild(opt);
+  });
+
+  // Restore feedback if already answered
+  const fb = $('feedback');
+  if (session.current in session.answered) {
+    showFeedback(q, session.correct[session.current]);
+  } else {
+    fb.className = 'feedback';
+    fb.style.display = 'none';
+  }
+
+  // Nav buttons
+  $('btn-prev').disabled = session.current === 0;
+  $('btn-next').textContent = session.current === total - 1 ? '🏁 Ver Resultados' : 'Siguiente →';
+
+  updateSidebar();
+}
+
+/* ══════════════════════════════════════════════════
+   SELECT OPTION
+══════════════════════════════════════════════════ */
+function selectOption(displayIdx) {
+  if (session.current in session.answered) return;
+
+  const q = session.questions[session.current];
+  const isCorrect = displayIdx === q.shuffledCorrect;
+
+  session.answered[session.current] = displayIdx;
+  session.correct[session.current] = isCorrect;
+
+  // Save to persistent history
+  state.history[q.originalIndex] = { correct: isCorrect, timestamp: Date.now() };
+  saveState();
+
+  // Style options
+  const opts = $('options-container').querySelectorAll('.option');
+  opts.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if (i === displayIdx) {
+      opt.classList.add(isCorrect ? 'correct' : 'wrong');
+    }
+    if (i === q.shuffledCorrect && !isCorrect) {
+      opt.classList.add('reveal-correct');
+    }
+    opt.removeEventListener('click', () => {});
+  });
+
+  showFeedback(q, isCorrect);
+  updateSidebar();
+  updateHome();
+
+  if (state.settings.autoAdvance) {
+    setTimeout(() => goTo(session.current + 1), 1600);
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   FEEDBACK
+══════════════════════════════════════════════════ */
+function showFeedback(q, isCorrect) {
+  const fb = $('feedback');
+  fb.style.display = '';
+  fb.className = `feedback ${isCorrect ? 'correct-fb' : 'wrong-fb'} show`;
+
+  $('fb-header').innerHTML = isCorrect
+    ? '✅ ¡Correcto! Excelente razonamiento.'
+    : '❌ Incorrecto — así se aprende mejor.';
+
+  $('fb-body').innerHTML = formatMD(q.feedback);
+
+  const tagsEl = $('fb-tags');
+  tagsEl.innerHTML = (q.tags || []).map(t => `<span class="fb-tag">${t}</span>`).join('');
+
+  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ══════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════ */
+function goTo(idx) {
+  if (idx < 0) return;
+  if (idx >= session.questions.length) {
+    showResults();
+    return;
+  }
+  session.current = idx;
+  renderQuestion();
+  $('quiz-main') && ($('quiz-main').scrollTop = 0);
+  document.querySelector('.quiz-main')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════════════ */
+function showResults() {
+  const total = session.questions.length;
+  const correct = Object.values(session.correct).filter(Boolean).length;
+  const wrong = Object.values(session.correct).filter(v => !v).length;
+  const skipped = total - Object.keys(session.answered).length;
+  const pct = Math.round((correct / total) * 100);
+
+  $('results-percent').textContent = `${pct}%`;
+  $('rb-correct').textContent = correct;
+  $('rb-wrong').textContent = wrong;
+  $('rb-skipped').textContent = skipped;
+
+  // Score ring
+  const deg = Math.round((pct / 100) * 360);
+  $('results-ring').style.setProperty('--score-deg', `${deg}deg`);
+
+  // Title & sub
+  let title, sub;
+  if (pct === 100) { title = '🏆 ¡Perfecto!'; sub = '¡Excelente! Dominaste todo el material.'; }
+  else if (pct >= 80) { title = '🎉 ¡Muy bien!'; sub = `Respondiste ${correct} de ${total} correctamente.`; }
+  else if (pct >= 60) { title = '📈 ¡Buen intento!'; sub = `${pct}% correcto. Sigue estudiando las que fallaste.`; }
+  else { title = '💪 ¡Sigue adelante!'; sub = `Aún hay temas por reforzar. ¡Repasa y vuelve a intentarlo!`; }
+
+  $('results-title').textContent = title;
+  $('results-sub').textContent = sub;
+
+  setScreen('results-screen');
+}
+
+/* ══════════════════════════════════════════════════
+   BOOKMARKS SCREEN
+══════════════════════════════════════════════════ */
+function showBookmarksScreen() {
+  const list = $('bookmarks-list');
+  list.innerHTML = '';
+
+  if (!state.bookmarks.length) {
+    list.innerHTML = `<div class="no-bookmarks"><div class="emoji">🔖</div><p>No tienes preguntas marcadas todavía.<br>Haz clic en el ícono de marcador dentro del cuestionario.</p></div>`;
+  } else {
+    state.bookmarks.forEach(origIdx => {
+      const q = QUESTIONS_RAW[origIdx];
+      if (!q) return;
+      const item = document.createElement('div');
+      item.className = 'bookmark-item';
+      item.innerHTML = `
+        <div class="bookmark-num">${origIdx + 1}</div>
+        <div class="bookmark-text">${q.q.substring(0, 100)}${q.q.length > 100 ? '…' : ''}</div>
+        <button class="btn btn-ghost btn-sm" data-idx="${origIdx}" style="flex-shrink:0">❌</button>`;
+      item.querySelector('button').addEventListener('click', e => {
+        e.stopPropagation();
+        toggleBookmark(origIdx);
+        showBookmarksScreen();
+      });
+      item.addEventListener('click', () => {
+        // Start quiz at this question
+        startQuiz('bookmarked');
+        const sessionIdx = session.questions.findIndex(q => q.originalIndex === origIdx);
+        if (sessionIdx >= 0) goTo(sessionIdx);
+      });
+      list.appendChild(item);
+    });
+  }
+  setScreen('bookmarks-screen');
+}
+
+function toggleBookmark(origIdx) {
+  const i = state.bookmarks.indexOf(origIdx);
+  if (i === -1) {
+    state.bookmarks.push(origIdx);
+    showToast('🔖 Pregunta marcada');
+  } else {
+    state.bookmarks.splice(i, 1);
+    showToast('Marca eliminada');
+  }
+  saveState();
+  updateHome();
+  updateSidebar();
+
+  const q = session.questions[session.current];
+  if (q) {
+    $('bookmark-btn').classList.toggle('active', state.bookmarks.includes(q.originalIndex));
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════════════ */
+function openSettings() {
+  $('toggle-shuffle').checked = !!state.settings.shuffle;
+  $('toggle-shuffle-opts').checked = !!state.settings.shuffleOpts;
+  $('toggle-auto-advance').checked = !!state.settings.autoAdvance;
+  $('settings-overlay').classList.add('open');
+}
+function closeSettings() { $('settings-overlay').classList.remove('open'); }
+
+function syncSettings() {
+  state.settings.shuffle = $('toggle-shuffle').checked;
+  state.settings.shuffleOpts = $('toggle-shuffle-opts').checked;
+  state.settings.autoAdvance = $('toggle-auto-advance').checked;
+  saveState();
+}
+
+/* ══════════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════════ */
+let pendingConfirm = null;
+function confirm(title, body, fn) {
+  $('modal-title').textContent = title;
+  $('modal-body').textContent = body;
+  pendingConfirm = fn;
+  $('modal-overlay').classList.add('open');
+}
+$('modal-cancel').addEventListener('click', () => $('modal-overlay').classList.remove('open'));
+$('modal-confirm').addEventListener('click', () => {
+  $('modal-overlay').classList.remove('open');
+  if (pendingConfirm) { pendingConfirm(); pendingConfirm = null; }
+});
+
+/* ══════════════════════════════════════════════════
+   EVENT LISTENERS
+══════════════════════════════════════════════════ */
+// Home
+$('mode-all').addEventListener('click', () => startQuiz('all'));
+$('mode-bookmarked').addEventListener('click', () => startQuiz('bookmarked'));
+$('mode-wrong').addEventListener('click', () => startQuiz('wrong'));
+[$('mode-all'), $('mode-bookmarked'), $('mode-wrong')].forEach(el => {
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') el.click(); });
+});
+
+// Quiz nav
+$('btn-next').addEventListener('click', () => goTo(session.current + 1));
+$('btn-prev').addEventListener('click', () => goTo(session.current - 1));
+$('btn-home-quiz').addEventListener('click', () => {
+  confirm('¿Volver al inicio?', 'Tu progreso de esta sesión se guardará.', () => {
+    setScreen('home-screen'); updateHome();
+  });
+});
+$('btn-shuffle-q').addEventListener('click', () => {
+  const shuffled = shuffle([...Array(session.questions.length).keys()]);
+  session.questions = shuffled.map(i => session.questions[i]);
+  session.current = 0;
+  session.answered = {};
+  session.correct = {};
+  buildSidebar();
+  renderQuestion();
+  showToast('🔀 Preguntas mezcladas');
+});
+$('bookmark-btn').addEventListener('click', () => {
+  const q = session.questions[session.current];
+  if (q) toggleBookmark(q.originalIndex);
+});
+
+// Results
+$('btn-retry-all').addEventListener('click', () => startQuiz(session.mode));
+$('btn-retry-wrong').addEventListener('click', () => startQuiz('wrong'));
+$('btn-home-results').addEventListener('click', () => { setScreen('home-screen'); updateHome(); });
+
+// Bookmarks
+$('btn-bookmarks-nav').addEventListener('click', showBookmarksScreen);
+$('btn-study-bookmarks').addEventListener('click', () => startQuiz('bookmarked'));
+$('btn-clear-bookmarks').addEventListener('click', () => {
+  confirm('¿Limpiar todas las marcas?', 'Esta acción no se puede deshacer.', () => {
+    state.bookmarks = [];
+    saveState();
+    showBookmarksScreen();
+    updateHome();
+    showToast('Marcas eliminadas');
+  });
+});
+$('btn-back-home-bk').addEventListener('click', () => { setScreen('home-screen'); updateHome(); });
+
+// Settings
+$('btn-settings').addEventListener('click', openSettings);
+$('btn-close-settings').addEventListener('click', closeSettings);
+$('settings-overlay').addEventListener('click', e => { if (e.target === $('settings-overlay')) closeSettings(); });
+$('toggle-shuffle').addEventListener('change', syncSettings);
+$('toggle-shuffle-opts').addEventListener('change', syncSettings);
+$('toggle-auto-advance').addEventListener('change', syncSettings);
+$('btn-reset-all').addEventListener('click', () => {
+  confirm('¿Borrar todo el progreso?', 'Se eliminarán historial, marcas y ajustes. No se puede deshacer.', () => {
+    state = { bookmarks: [], settings: { shuffle: false, shuffleOpts: false, autoAdvance: false }, history: {} };
+    saveState();
+    closeSettings();
+    setScreen('home-screen');
+    updateHome();
+    showToast('Progreso eliminado');
+  });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if ($('quiz-screen').classList.contains('active')) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(session.current + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(session.current - 1); }
+    if (['a','b','c','d','A','B','C','D','1','2','3','4'].includes(e.key)) {
+      const map = { a:0,A:0,'1':0, b:1,B:1,'2':1, c:2,C:2,'3':2, d:3,D:3,'4':3 };
+      const idx = map[e.key];
+      if (idx !== undefined) selectOption(idx);
+    }
+    if (e.key === 'b' || e.key === 'B') {
+      const q = session.questions[session.current];
+      if (q) toggleBookmark(q.originalIndex);
+    }
+  }
+});
+
+/* ══════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════ */
+updateHome();
+</script>
+</body>
+</html>

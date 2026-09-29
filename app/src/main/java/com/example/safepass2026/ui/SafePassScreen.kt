@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+//import com.example.safepass2026.data.Asistente
 import com.example.safepass2026.logic.procesarCheckIn
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,6 +23,9 @@ fun SafePassScreen(modifier: Modifier = Modifier) {
 
     // Estado reactivo que gobierna la pantalla, inicializado en Idle
     var estadoRegistro by remember { mutableStateOf<RegistroState>(RegistroState.Idle) }
+
+    //OPCIÓN CUANDO PIDE GUARDAR LOS NOMBRES EN UNA LISTA
+    //val historialAsistente = remember { mutableStateListOf<Asistente>() }
 
     Scaffold(
         topBar = {
@@ -84,6 +88,7 @@ fun SafePassScreen(modifier: Modifier = Modifier) {
 
             // Botón de Procesamiento
             Button(
+                
                 // EL BOTÓN SOLO APARECE SI SE ESCRIBE ALGO
                 //enabled = nombreInput.isNotBlank() && edadInput.isNotBlank() && tipoEntradaInput.isNotBlank(),
 
@@ -121,6 +126,13 @@ fun SafePassScreen(modifier: Modifier = Modifier) {
                         nombreInput = ""
                         edadInput = ""
                     }*/
+
+                    //OPCIÓN PARA USAR LA LISTA DE ASISTENTES
+                    /*if (estadoRegistro is RegistroState.Success) {
+                        val asistenteAprobado = (estadoRegistro as RegistroState.Success).asistente
+                        historialAsistente.add(asistenteAprobado) // Guarda en la lista
+                    }*/
+
 
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -179,18 +191,61 @@ fun SafePassScreen(modifier: Modifier = Modifier) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = state.causa,
+
+                                //OPCIÓN PARA CUANDO LA CAUSA AHORA ES UNA INTERFACE
+                                //text= state.error.mensaje,
+
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
                 }
+
+                
                 // ESTADO DE CARGA
                 /*
                 is RegistroState.Loading -> {
                     CircularProgressIndicator()
                 }*/
+
+                                // RETO WARNING: RENDERIZADO DE LA ADVERTENCIA
+                /*
+                is RegistroState.Warning -> {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4)), // Amarillo claro
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = "ADVERTENCIA",
+                                color = Color(0xFFF57F17), // Texto naranja/amarillo oscuro
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = state.mensaje,
+                                color = Color(0xFFF57F17),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+                */
+
             }
+
+            // --- RETO DEL LAB 9: CONTADOR DE PASES VIP ---
+            // (Descomentar si el ingeniero lo pide)
+            /*
+            Spacer(modifier = Modifier.height(16.dp))
+            val totalVip = historialAsistente.count { it.tipoEntrada.equals("VIP", ignoreCase = true) }
+            Text(
+                text = "Total VIPs Registrados en el historial: $totalVip",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            */
         }
     }
 }
