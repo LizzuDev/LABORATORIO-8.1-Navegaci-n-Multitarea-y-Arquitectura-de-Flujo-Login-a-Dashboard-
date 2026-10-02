@@ -1,0 +1,3 @@
+"URGENTE EXAMEN: El ingeniero me acaba de pedir lo siguiente: [ESCRIBE AQUÍ LO QUE TE PIDIÓ]. Revisa los archivos del proyecto (SafePassLogic.kt, SafePassScreen.kt, RegistroState.kt, Asistente.kt). Busca entre los comentarios en MAYÚSCULAS que dejamos preparados. Si el reto ya está ahí, utiliza tus herramientas de edición para DESCOMENTAR el código en todos los archivos necesarios. Si la petición del ingeniero tiene una pequeña variación respecto a lo que tenemos comentado, ADAPTA el código para que cumpla exactamente con lo que pide. Haz los cambios directamente en los archivos de la forma más rápida posible para que el programa compile sin errores."
+
+@examen Pon un contador que diga cuántos VIPs hay en la parte de abajo.
