@@ -25,6 +25,7 @@ fun procesarCheckIn(
     nombreEntrada: String,
     edadTexto: String,
     tipoEntrada: String,
+    codigoDescuento: String?,
     // email: String,
     calcularPrioridad: (Asistente) -> Boolean //la interfaz tiene la lógica del lambda
 ): RegistroState {
@@ -72,7 +73,8 @@ fun procesarCheckIn(
     val nuevoAsistente = Asistente(
         nombre = nombreEntrada.trim(),
         edad = edadSegura,
-        tipoEntrada = tipoEntrada
+        tipoEntrada = tipoEntrada,
+        codigoDescuento = codigoDescuento
         // NO OLVIDES LA COMA, email = email
     ).apply {
         // REPASAR APLICAR ALGO EN ESTE APPLY
@@ -81,15 +83,16 @@ fun procesarCheckIn(
          */
     }
 
-    val resumenEdad: String = nuevoAsistente.edad?.let { edadNoNula -> "Edad: $edadNoNula" } ?: "Edad no disponible"
+    // RETO: USO DE .LET PARA TRANSFORMAR A MAYÚSCULAS SI HAY CÓDIGO
+    val asistenteFinal = nuevoAsistente.codigoDescuento?.let {
+        nuevoAsistente.copy(nombre = nuevoAsistente.nombre.uppercase())
+    } ?: nuevoAsistente
 
-    return nuevoAsistente.run {
+    val resumenEdad: String = asistenteFinal.edad?.let { edadNoNula -> "Edad: $edadNoNula" } ?: "Edad no disponible"
+
+    return asistenteFinal.run {
         val tienePrioridad = calcularPrioridad(this)
         val resumen = "¡Registro exitoso! $nombre | $tipoEntrada | $resumenEdad | Prioridad: ${if (tienePrioridad) "ALTA" else "ESTÁNDAR"}"
-
-        // DEVOLVER EL RESULTADO CON NOMBRE EN MAYÚSCULAS
-        // UTILIZAMOS THIS.NOMBRE.UPPERCASE() DENTRO DEL RUN
-        //val resumen = "¡Registro exitoso! ${this.nombre.uppercase()} | $tipoEntrada | $resumenEdad | Prioridad: ${if (tienePrioridad) "ALTA" else "ESTÁNDAR"}"
 
         RegistroState.Success(asistente = this, pasePrioritario = tienePrioridad, mensaje = resumen)
     }

@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+# PDF exclusions requested by user
+Informe_Laboratorio_7.2_IdentidadVisual_MaterialYou_Grupo1.pdf
+Laboratorio 4. Gestión de Inventario Segura-Aguinaga,Cadena,Rosero,Molina,Flores.docx (1).pdf
+RDA-1-ExamenPractico.pdf
+RDA-2_Lab7.2.Identidad Visual con Material You -Estud.pdf
+*.pdf

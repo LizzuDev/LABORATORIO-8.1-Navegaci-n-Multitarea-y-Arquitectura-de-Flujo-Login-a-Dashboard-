@@ -20,6 +20,7 @@ fun SafePassScreen(modifier: Modifier = Modifier) {
     var nombreInput by remember { mutableStateOf("") }
     var edadInput by remember { mutableStateOf("") }
     var tipoEntradaInput by remember { mutableStateOf("General") }
+    var codigoDescuentoInput by remember { mutableStateOf("") }
 
     // Estado reactivo que gobierna la pantalla, inicializado en Idle
     var estadoRegistro by remember { mutableStateOf<RegistroState>(RegistroState.Idle) }
@@ -72,6 +73,15 @@ fun SafePassScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // RETO: Campo de Código de Descuento
+            OutlinedTextField(
+                value = codigoDescuentoInput,
+                onValueChange = { codigoDescuentoInput = it },
+                label = { Text("Código de Descuento (Opcional)") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
             // Selector simple de Entrada
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -98,6 +108,7 @@ fun SafePassScreen(modifier: Modifier = Modifier) {
                         nombreEntrada = nombreInput,
                         edadTexto = edadInput,
                         tipoEntrada = tipoEntradaInput,
+                        codigoDescuento = codigoDescuentoInput.takeIf { it.isNotBlank() },
                         calcularPrioridad = { asistente ->
                             // Regla de negocio: Entradas VIP tienen prioridad automática
                             asistente.tipoEntrada.equals("VIP", ignoreCase = true)
@@ -174,6 +185,15 @@ fun SafePassScreen(modifier: Modifier = Modifier) {
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color(0xFF1B5E20)
                             )
+                            // RETO: Distintivo de Cupón Aplicado
+                            if (state.asistente.codigoDescuento != null) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "¡Cupón Aplicado!",
+                                    color = Color(0xFF388E3C), // Verde oscuro
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }
