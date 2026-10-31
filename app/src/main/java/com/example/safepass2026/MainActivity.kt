@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.safepass2026.ui.SafePassScreen
+import com.example.safepass2026.ui.navigation.AppNavigation
 import com.example.safepass2026.ui.theme.SafePass2026Theme
 
 class MainActivity : ComponentActivity() {
@@ -45,7 +46,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SafePass2026Theme {
-                MainAppHost()
+                // Inyectamos el grafo de navegación
+                AppNavigation()
             }
         }
     }
